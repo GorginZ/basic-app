@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -15,8 +16,6 @@ type Metadata struct {
 }
 
 func appMetadata(w http.ResponseWriter, r *http.Request) {
-	// currentCommit := os.Getenv("CURRENT_COMMIT")
-
 	currentCommit, ok := os.LookupEnv("CURRENT_COMMIT")
 	if !ok {
 		fmt.Println("CURRENT_COMMIT is not present")
@@ -24,7 +23,16 @@ func appMetadata(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("currentCommit: %s\n", currentCommit)
 	}
 
-	metadata := Metadata{Version: "1.0.0", Description: "basic app", CurrentCommit: currentCommit}
+	version, err := ioutil.ReadFile("VERSION")
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+	//figure out error handling here
+	// if err == nil {
+	versionString := string(version[:])
+	// }
+
+	metadata := Metadata{Version: versionString, Description: "basic app", CurrentCommit: currentCommit}
 	fmt.Println("endpoint /metadata hit")
 	json.NewEncoder(w).Encode(metadata)
 
