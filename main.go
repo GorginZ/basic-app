@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 type Metadata struct {
@@ -14,7 +15,16 @@ type Metadata struct {
 }
 
 func appMetadata(w http.ResponseWriter, r *http.Request) {
-	metadata := Metadata{Version: "1.0.0", Description: "basic app", CurrentCommit: "asdf"}
+	// currentCommit := os.Getenv("CURRENT_COMMIT")
+
+	currentCommit, ok := os.LookupEnv("CURRENT_COMMIT")
+	if !ok {
+		fmt.Println("CURRENT_COMMIT is not present")
+	} else {
+		fmt.Printf("currentCommit: %s\n", currentCommit)
+	}
+
+	metadata := Metadata{Version: "1.0.0", Description: "basic app", CurrentCommit: currentCommit}
 	fmt.Println("endpoint /metadata hit")
 	json.NewEncoder(w).Encode(metadata)
 
