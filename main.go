@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,33 +15,47 @@ type Metadata struct {
 	CurrentCommit string `json:"CurrentCommit"`
 }
 
-func appMetadata(w http.ResponseWriter, r *http.Request) {
-	// currentCommit := os.Getenv("CURRENT_COMMIT")
+func appMetadataEndpoint(w http.ResponseWriter, r *http.Request) {
 
+	currentCommit := getCurrentCommit()
+	version := getCurrentVersionAsString()
+	description := "basic app / = hello world /metadata = info"
+
+	metadata := Metadata{Version: version, Description: description, CurrentCommit: currentCommit}
+	fmt.Println("endpoint /metadata hit")
+	json.NewEncoder(w).Encode(metadata)
+}
+
+func getCurrentCommit() string {
 	currentCommit, ok := os.LookupEnv("CURRENT_COMMIT")
 	if !ok {
 		fmt.Println("CURRENT_COMMIT is not present")
 	} else {
 		fmt.Printf("currentCommit: %s\n", currentCommit)
 	}
-
-	metadata := Metadata{Version: "1.0.0", Description: "basic app", CurrentCommit: currentCommit}
-	fmt.Println("endpoint /metadata hit")
-	json.NewEncoder(w).Encode(metadata)
-
+	return currentCommit
 }
 
-func homePage(w http.ResponseWriter, r *http.Request) {
+func getCurrentVersionAsString() string {
+	version, err := ioutil.ReadFile("VERSION")
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+	versionString := string(version[:])
+	return versionString
+}
+
+func rootEndpoint(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World!")
 }
 
-func handleRequests() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/metadata", appMetadata)
+func router() {
+	http.HandleFunc("/", rootEndpoint)
+	http.HandleFunc("/metadata", appMetadataEndpoint)
 
 	log.Fatal(http.ListenAndServe(":8001", nil))
 }
 
 func main() {
-	handleRequests()
+	router()
 }
