@@ -2,12 +2,6 @@ name: basic-app-pipeline
 on: [push]
 jobs:
 
-# on:
-#   release:
-#     types: [created]
-#   # run manually
-#   workflow_dispatch:
-
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -30,4 +24,4 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       run: |
-        ./bin/build-and-push-image.sh 
+        ./bin/10-build-and-push-image.sh 
