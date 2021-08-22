@@ -36,7 +36,7 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         echo $GITHUB_SHA
-        ./bin/build-and-publish-image.sh 
+        ./bin/build-and-push-image.sh 
 
         echo ${{steps.build-image.outputs.image}}
 
