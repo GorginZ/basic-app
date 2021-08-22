@@ -2,12 +2,11 @@ name: basic-app-pipeline
 on: [push]
 jobs:
 
-# on:
-#   release:
-#     types: [created]
-#   # run manually
-#   workflow_dispatch:
-
+on:
+  release:
+    types: [created]
+  # run manually
+  workflow_dispatch:
 
   deploy:
     name: Deploy
@@ -30,38 +29,5 @@ jobs:
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: basic-app
-        IMAGE_TAG: ${{ github.sha }}
       run: |
-        echo $GITHUB_SHA
-        echo $ECR_REGISTRY
-        echo $ECR_REPOSITORY
         ./bin/build-and-push-image.sh 
-
-        echo ${{steps.build-image.outputs.image}}
-
-        # docker build --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-        #     --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-        #     --build-arg AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
-        #     --build-arg FLASK_SECRET_KEY="${{ secrets.FLASK_SECRET_KEY }}" \
-        #     -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        # docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        # echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-    # - name: Fill in the new image ID in the Amazon ECS task definition
-    #   id: task-def
-    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-    #   with:
-    #     task-definition: aws-task-definition.json
-    #     container-name: aws-ecs-demo-ecr
-    #     image: ${{ steps.build-image.outputs.image }}
-
-    # - name: Deploy Amazon ECS task definition
-    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-    #   with:
-    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-    #     service: aws-ecs-demo-service
-    #     cluster: aws-ecs-demo-cluster
-    #     wait-for-service-stability: true
