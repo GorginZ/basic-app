@@ -10,4 +10,3 @@ docker push "$ecrname:$commit"
 
 docker build -t "$ecrname:latest" . 
 docker push "$ecrname:latest"
-
